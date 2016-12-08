@@ -5,6 +5,8 @@ import util.SliceSampler;
 import data.Email;
 import data.EmailCorpus;
 
+import java.util.Arrays;
+
 /**
  * The primary class that determines the structure of the model being used.
  * 
@@ -132,6 +134,8 @@ public abstract class JointStructure {
 //	}
 
 	protected AssignmentScore initializeAssignmentScore(double[] alpha) {
+		double[] alphaPrime = new double[alpha.length];
+		Arrays.fill(alphaPrime, 0.01); // Replace this value here for different values of alphaPrime and update constructor
 		return new AsymmetricAssignmentScore(numDocs, numFeatures, alpha, null, this);
 	}
 
