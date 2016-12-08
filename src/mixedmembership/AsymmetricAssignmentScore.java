@@ -13,15 +13,18 @@ import java.util.zip.GZIPOutputStream;
 public class AsymmetricAssignmentScore extends AssignmentScore {
 
     private final double[] asymmetricPrior;
+    private final AssignmentScore integratedM;
 
     public AsymmetricAssignmentScore(int numDocuments, int numTopics, double[] alpha, double[] alphaPrime,
                            JointStructure modelStructure) {
         super(numDocuments, numTopics, alpha, modelStructure);
         if(alphaPrime == null) {
             this.asymmetricPrior = setAsymmetricPrior(numTopics);
+            this.integratedM = null;
         }
         else{
             this.asymmetricPrior = null;
+            this.integratedM = new AssignmentScore(numDocuments, numTopics, alphaPrime, modelStructure);
         }
     }
 
@@ -48,9 +51,48 @@ public class AsymmetricAssignmentScore extends AssignmentScore {
         return this.softmax(ret);
     }
 
+    // for keeping data structures updated
+    @Override
+    public void incrementCounts(int c, int i) {
+        componentElementCounts[c][i]++;
+        componentCountsNorm[c]++;
+        if(this.integratedM != null){
+            this.integratedM.incrementCounts(c, i);
+        }
+    }
+
+    // for keeping data structures updated
+    @Override
+    public void decrementCounts(int c, int i) {
+        componentElementCounts[c][i]--;
+        componentCountsNorm[c]--;
+        assert componentElementCounts[c][i] >= 0;
+        if(this.integratedM != null){
+            this.integratedM.decrementCounts(c, i);
+        }
+    }
+
+    // clear data structures
+    @Override
+    public void resetCounts() {
+
+        for (int c = 0; c < numComponents; c++)
+            Arrays.fill(componentElementCounts[c], 0);
+
+        Arrays.fill(componentCountsNorm, 0);
+        if(this.integratedM != null){
+            this.integratedM.resetCounts();
+        }
+    }
+
     @Override
     public double getLogValue(int doc, int topic){
-        return Math.log(componentElementCounts[doc][topic] + alpha[0]*this.asymmetricPrior[topic]);
+        if(this.integratedM == null) {
+            return Math.log(componentElementCounts[doc][topic] + alpha[0] * this.asymmetricPrior[topic]);
+        }
+        else{
+            return Math.log(componentElementCounts[doc][topic] + alpha[0] * this.integratedM.getLogScore(doc, topic));
+        }
     }
 
     public void print(EmailCorpus emails, String fileName) {
