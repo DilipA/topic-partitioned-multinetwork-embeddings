@@ -20,14 +20,16 @@ import data.EmailCorpus;
 public abstract class DirichletMultinomialScore implements SliceSamplable {
 
 	protected double[] alpha;
-	protected int numComponents;
-	protected int numElements;
+	protected int numComponents; // Components are documents
+	protected int numElements; // Elements are topics
 
 	// tracks how many items of each type of element are assigned in each
 	// component
+	// Total number of times topic t is assigned in document d
 	protected int[][] componentElementCounts;
 
 	// tracks how many items total are assigned in each component
+	// Total number of topic assignments in document
 	protected int[] componentCountsNorm;
 
 	JointStructure modelStructure;

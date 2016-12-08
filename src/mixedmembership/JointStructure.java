@@ -37,6 +37,7 @@ public abstract class JointStructure {
 
 	WordScore wordScore;
 	AssignmentScore assignmentScore;
+//	AsymmetricAssignmentScore assignmentScore;
 
 	EdgeScore edgeScore;
 
@@ -126,9 +127,14 @@ public abstract class JointStructure {
 	}
 
 	// determines what assignment score this model will use
+//	protected AssignmentScore initializeAssignmentScore(double[] alpha) {
+//		return new AssignmentScore(numDocs, numFeatures, alpha, this);
+//	}
+
 	protected AssignmentScore initializeAssignmentScore(double[] alpha) {
-		return new AssignmentScore(numDocs, numFeatures, alpha, this);
+		return new AsymmetricAssignmentScore(numDocs, numFeatures, alpha, null, this);
 	}
+
 
 	protected void initializeDataStructures(int[][] initWordAssignments,
 			int[][] initEdgeAssignments, boolean initializeMissingEdges,
@@ -655,6 +661,10 @@ public abstract class JointStructure {
 	public AssignmentScore getAssignmentScore() {
 		return assignmentScore;
 	}
+
+//	public AsymmetricAssignmentScore getAssignmentScore() {
+//		return assignmentScore;
+//	}
 
 	public double[] getGamma() {
 		return ((EdgeScoreBernoulli) edgeScore).getGamma();
