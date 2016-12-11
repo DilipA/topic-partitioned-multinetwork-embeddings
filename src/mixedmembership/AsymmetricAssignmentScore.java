@@ -1,5 +1,6 @@
 package mixedmembership;
 
+import cc.mallet.util.ArrayUtils;
 import data.EmailCorpus;
 import util.Probability;
 
@@ -12,12 +13,14 @@ import java.util.zip.GZIPOutputStream;
  */
 public class AsymmetricAssignmentScore extends AssignmentScore {
 
+    private final double[] alphaPrime;
     private final double[] asymmetricPrior;
     private final AssignmentScore integratedM;
 
     public AsymmetricAssignmentScore(int numDocuments, int numTopics, double[] alpha, double[] alphaPrime,
                            JointStructure modelStructure) {
         super(numDocuments, numTopics, alpha, modelStructure);
+        this.alphaPrime = alphaPrime;
         if(alphaPrime == null) {
             this.asymmetricPrior = setAsymmetricPrior(numTopics);
             this.integratedM = null;
@@ -157,6 +160,24 @@ public class AsymmetricAssignmentScore extends AssignmentScore {
     @Override
     public double logProb() {
         return modelStructure.logPriorProb();
+    }
+
+    @Override
+    public double[] getSliceSamplableParameters() {
+        if(this.alphaPrime == null){
+            return alpha;
+        }
+        else{
+            return ArrayUtils.append(alpha, alphaPrime);
+        }
+    }
+
+    @Override
+    public void setSliceSamplableParameters(double[] newValues) {
+        System.arraycopy(newValues, 0, alpha, 0, alpha.length);
+        if(this.alphaPrime != null) {
+            System.arraycopy(newValues, alpha.length+1, alphaPrime, 0, alphaPrime.length);
+        }
     }
 
 }
