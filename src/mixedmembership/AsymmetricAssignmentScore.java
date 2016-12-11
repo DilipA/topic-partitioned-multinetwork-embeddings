@@ -94,7 +94,7 @@ public class AsymmetricAssignmentScore extends AssignmentScore {
             return Math.log(componentElementCounts[doc][topic] + alpha[0] * this.asymmetricPrior[topic]);
         }
         else{
-            return Math.log(componentElementCounts[doc][topic] + alpha[0] * this.integratedM.getLogScore(doc, topic));
+            return Math.log(componentElementCounts[doc][topic] + alpha[0] * this.integratedM.getAsymmetricLogScore(topic));
         }
     }
 

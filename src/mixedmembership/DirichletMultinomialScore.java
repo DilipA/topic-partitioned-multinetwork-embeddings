@@ -79,6 +79,29 @@ public abstract class DirichletMultinomialScore implements SliceSamplable {
 				* alpha[0]);
 	}
 
+	public double getAsymmetricLogScore(int i){
+		return getAsymmetricLogValue(i) - getAsymmetricLogNormalizer();
+	}
+
+	public double getAsymmetricLogValue(int  i){
+		double componentElementCountSum = 0.0;
+		for(int c=0;c < this.numComponents;c++){
+			componentElementCountSum += componentElementCounts[c][i];
+		}
+		return Math.log(componentElementCountSum + 1.0/numElements * alpha[0]);
+	}
+
+	public double getAsymmetricLogNormalizer(){
+		double normalizerSum = 0.0;
+		for(int i=0;i < this.numElements;i++){
+			for(int c=0;c < this.numComponents;c++) {
+				normalizerSum += componentElementCounts[c][i];
+			}
+		}
+
+		return Math.log(normalizerSum + alpha[0]);
+	}
+
 	public double getLogNormalizer(int c) {
 		return Math.log(componentCountsNorm[c] + alpha[0]);
 	}
